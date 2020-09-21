@@ -1,4 +1,4 @@
 ---
 # vars file for openproject
 
-is_postgresql: no
+is_postgresql: 
