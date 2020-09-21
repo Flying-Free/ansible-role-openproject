@@ -1,5 +1,0 @@
----
-# tasks file for openproject
-- include_tasks: prerequisites.yml
-
-- includ

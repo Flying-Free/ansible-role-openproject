@@ -1,4 +1,0 @@
----
-
-- get_url: Download openproject repository
-    dest: /etc/yum.repos.d/openproject.repo
