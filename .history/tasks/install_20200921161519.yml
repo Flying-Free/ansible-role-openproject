@@ -1,0 +1,5 @@
+---
+
+  get_url: Download openproject repository
+    url: file:///tmp/afile.txt
+    dest: /etc/yum.repos.d/openproject.repo

@@ -1,0 +1,6 @@
+---
+
+- name: Download file from a file path
+  get_url:
+    url: file:///tmp/afile.txt
+    dest: /tmp/afilecopy.txt

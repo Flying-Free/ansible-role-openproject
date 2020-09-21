@@ -1,0 +1,11 @@
+---
+
+- name: Ensure yum packages are up to date
+  yum:
+    name: '*'
+    state: latest
+
+- name: Install wget package (RedHat based)
+  yum: 
+    name: wget
+    state: installed

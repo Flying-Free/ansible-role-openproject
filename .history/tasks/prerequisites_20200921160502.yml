@@ -1,0 +1,6 @@
+---
+
+- name: Ensure yum packages are up to date
+  yum:
+    name: '*'
+    state: latest
