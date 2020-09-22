@@ -1,4 +1,6 @@
 ---
 # vars file for openproject
-
+openproject_group: openproject
+openproject_user: openproject
+openproject_user_pass: changeme
 is_postgresql: no

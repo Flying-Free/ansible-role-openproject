@@ -1,2 +1,23 @@
 ---
 # defaults file for openproject
+
+system-dependences:
+ - zlib1g-dev
+ - build-essential
+ - libssl-dev
+ - libreadline-dev                      
+ - libyaml-dev
+ - libgdbm-dev                         
+ - libncurses5-dev
+ - automake                        
+ - libtool bison
+ - libffi-dev
+ - git
+ - curl               
+ - poppler-utils
+ - unrtf
+ - tesseract-ocr
+ - catdoc        
+ - libxml2
+ - libxml2-dev
+ - libxslt1-dev

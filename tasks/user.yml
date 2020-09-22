@@ -1,0 +1,15 @@
+---
+- name: Ensure group exists
+  group:
+    name: "{{ openproject_group }}"
+    state: present
+  become: yes
+
+- name: Ensure user exists
+  user:
+    name: "{{ openproject_user }}"
+    home: "/home/{{ openproject_user }}" 
+    shell: "/bin/bash"
+    groups: "{{ openproject_group }}"
+    append: yes
+    password: "{{ openproject_user_pass }}"
