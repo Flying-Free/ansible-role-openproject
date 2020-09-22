@@ -1,5 +1,23 @@
 ---
 
-- include_tasks: user.yml
+# The user is the operating system user the command is executed with. 
+# In our case it will be root for most of the time or openproject.
 
-- include_tasks: dependences.yml
+# If you find any bugs or you have any recommendations for improving this tutorial,
+#  please, feel free to create a pull request against this guide.
+
+- include_tasks: pre-tasks/user.yml
+
+- include_tasks: pre-tasks/dependencies.yml
+
+- include_tasks: pre-tasks/postgresql.yml
+  when: not is_postgresql
+
+- include_tasks: pre-tasks/ruby.yml
+
+- include_tasks: pre-tasks/node.yml
+
+- include_tasks: setup.yml
+
+- include_tasks: configuration.yml
+

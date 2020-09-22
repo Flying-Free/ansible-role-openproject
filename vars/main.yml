@@ -3,4 +3,12 @@
 openproject_group: openproject
 openproject_user: openproject
 openproject_user_pass: changeme
-is_postgresql: no
+
+is_postgresql: yes
+is_apache: yes
+
+openproject_postgres:
+  host: None
+  name: None
+  user: None
+  pass: None 

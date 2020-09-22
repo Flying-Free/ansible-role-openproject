@@ -1,0 +1,53 @@
+---
+# Installation of Ruby
+# The are several possibilities to install Ruby on your machine. We will use rbenv. 
+# Please be aware that the actual installation of a specific Ruby version takes some time to finish.
+
+# [root@host] su openproject --login
+# [openproject@host] git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
+# [openproject@host] echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
+# [openproject@host] echo 'eval "$(rbenv init -)"' >> ~/.profile
+# [openproject@host] source ~/.profile
+# [openproject@host] git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+
+# [openproject@host] rbenv install 2.6.1
+# [openproject@host] rbenv rehash
+# [openproject@host] rbenv global 2.6.1
+# To check our Ruby installation we run ruby --version. It should output something very similar to:
+
+# ruby 2.6.1pXYZ (....) [x86_64-linux]
+
+- name: Clone ruby environment repository
+  git:
+    repo: https://github.com/sstephenson/rbenv.git
+    dest: ~/.rbenv
+  become: yes
+  become_user: "{{ openproject_user }}"
+
+- name: Add rbenv to the PATH
+  shell: |
+    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
+    echo 'eval "$(rbenv init -)"' >> ~/.profile
+  become: yes
+  become_user: "{{ openproject_user }}"
+
+- name: Source the ~/.profile file
+  shell: source ~/.profile
+  become: yes
+  become_user: "{{ openproject_user }}"
+
+- name: Clone ruby build repository
+  git:
+    repo: https://github.com/sstephenson/ruby-build.git
+    dest: ~/.rbenv/plugins/ruby-build
+  become: yes
+  become_user: "{{ openproject_user }}"
+
+- name: Install ruby
+  shell: |
+    rbenv install 2.6.1
+    rbenv rehash
+    rbenv global 2.6.1
+  become: yes
+  become_user: "{{ openproject_user }}"
+

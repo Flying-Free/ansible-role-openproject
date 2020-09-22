@@ -1,0 +1,21 @@
+---
+
+# Create a dedicated OpenProject user
+# sudo groupadd openproject
+# sudo useradd --create-home --gid openproject openproject
+# sudo passwd openproject #(enter desired password)
+
+- name: Ensure group exists
+  group:
+    name: "{{ openproject_group }}"
+    state: present
+  become: yes
+
+- name: Ensure user exists
+  user:
+    name: "{{ openproject_user }}"
+    home: "/home/{{ openproject_user }}" 
+    shell: "/bin/bash"
+    group: "{{ openproject_group }}"
+    append: yes
+    password: "{{ openproject_user_pass }}"

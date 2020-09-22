@@ -1,0 +1,46 @@
+---
+
+# Install and setup the database server (PostgreSQL)
+# OpenProject requires PostgreSQL v9.5+. 
+# If you system package is too old, you can check https://www.postgresql.org/download/ 
+# to get a newer version installed. In our case, Ubuntu 18.04 comes with a recent-enough 
+# version so we can use the system packages:
+
+# [root@host] apt-get install postgresql postgresql-contrib libpq-dev
+# Once installed, switch to the PostgreSQL system user.
+
+# [root@host] su - postgres
+# Then, as the PostgreSQL user, create the database user for OpenProject. 
+# This will prompt you for a password. We are going to assume in the following guide 
+# that this password is ‘openproject’. Of course, please choose a strong password and 
+# replace the values in the following guide with it!
+
+# [postgres@host] createuser -W openproject
+# Next, create the database owned by the new user
+
+# [postgres@host] createdb -O openproject openproject
+# Lastly, revert to the previous system user:
+
+# [postgres@host] exit
+# # You will be root again now.
+
+- name: Ensure Postgresql is installed
+  yum:
+    name:
+      - postgresql
+      - postgresql-contrib
+      - libpq-dev
+  state: present
+  become: yes
+
+- name: Create openproject user
+  postgresql_user:
+    name: openproject
+    password: "{{ openproject_user_pass }}"
+    expires: infinity
+
+- name: Create a new database with name "openproject"
+  postgresql_db:
+    name: openproject
+    owner: openproject
+  become_user: postgresql

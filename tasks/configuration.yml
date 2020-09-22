@@ -1,0 +1,61 @@
+---
+
+# Configure OpenProject
+# Create and configure the database configuration file in config/database.yml 
+# (relative to the openproject directory).
+
+# [openproject@host] cp config/database.yml.example config/database.yml
+# Now we edit the config/database.yml file and insert our database credentials for PostgreSQL. 
+# It should look like this (please keep in mind that you have to use the values you used above: user,
+# database and password):
+
+# production:
+#   adapter: postgresql
+#   encoding: unicode
+#   database: openproject
+#   pool: 5
+#   username: openproject
+#   password: openproject
+# Next we configure email notifications (this example uses a gmail account)
+# by creating the configuration.yml in config directory.
+
+# [openproject@host] cp config/configuration.yml.example config/configuration.yml
+# Now we edit the configuration.yml file to suit our needs.
+
+# production:                          #main level
+#   email_delivery_method: :smtp       #settings for the production environment
+#   smtp_address: smtp.gmail.com
+#   smtp_port: 587
+#   smtp_domain: smtp.gmail.com
+#   smtp_user_name: ***@gmail.com
+#   smtp_password: ****
+#   smtp_enable_starttls_auto: true
+#   smtp_authentication: plain
+# Add this line into configuration.yml file at the end of the file for a better performance of OpenProject:
+
+# rails_cache_store: :memcache
+# NOTE: You should validate your yml files, for example with http://www.yamllint.com/.
+# Both, the database.yml and configuration.yml file are sensitive to whitespace.
+# It is pretty easy to write invalid yml files without seeing the error.
+# Validating those files prevents you from such errors.
+
+- name: Ensure the database configuration file is up tu date
+  become: yes
+  template: 
+    src: database.yml.j2
+    dest: ~/openproject/config/database.yml
+    owner: '{{ openproject_user }}'
+    group: '{{ openproject_group }}'
+    mode: '0644'
+  notify: apache - restart
+
+# TODO  Change configuration.yml.j2 and vars in order to connect to the smtp server
+# - name: Ensure common configuration file is up t date
+#   become: yes
+#   template: 
+#     src: configuration.yml.j2
+#     dest: ~/openproject/config/configuration.yml
+#     owner: '{{ openproject_user }}'
+#     group: '{{ openproject_group }}'
+#     mode: '0644'
+#   notify: apache - restart

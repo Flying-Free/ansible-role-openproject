@@ -1,0 +1,34 @@
+---
+
+# Install the required system dependencies
+# [root@host] apt-get update -y
+# [root@host] apt-get install -y zlib1g-dev build-essential           \
+#                     libssl-dev libreadline-dev                      \
+#                     libyaml-dev libgdbm-dev                         \
+#                     libncurses5-dev automake                        \
+#                     libtool bison libffi-dev git curl               \
+#                     poppler-utils unrtf tesseract-ocr catdoc        \
+#                     libxml2 libxml2-dev libxslt1-dev # nokogiri
+
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+  become: yes
+
+- name: Ensure system dependencies are installed
+  yum:
+    name: "{{ item }}"
+    state: present
+  become: yes
+  with_items: "{{ system_dependencies }}"
+
+
+# Install the caching server (memcached)
+# [root@host] apt-get install -y memcached
+
+- name: Ensure the caching server (memcached) is installed
+  yum:
+    name: memcached
+    state: present
+  become: yes

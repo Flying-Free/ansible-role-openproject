@@ -1,0 +1,55 @@
+---
+
+# Installation of OpenProject
+# We will install the OpenProject Community Edition. 
+# It contains the recommended set of plugins for use with OpenProject. 
+# For more information, see https://github.com/opf/openproject.
+
+# [openproject@host] cd ~
+# [openproject@host] git clone https://github.com/opf/openproject.git --branch stable/9 --depth 1
+# [openproject@host] cd openproject
+# # Ensure rubygems is up-to-date for bundler 2
+# [openproject@host] gem update --system
+# [openproject@host] gem install bundler
+# # Replace mysql with postgresql if you had to install MySQL
+# [openproject@host] bundle install --deployment --without mysql2 sqlite development test therubyracer docker
+# [openproject@host] npm install
+
+- name: Clone OpenProject repository
+  git:
+    repo: https://github.com/opf/openproject.git
+    dest: ~/
+    version: stable/9
+    depth: "1"
+  become: yes
+  become_user: "{{ openproject_user }}"
+
+- name: Update gem
+  shell: 
+    cmd: gem update --system
+    chdir: ~/openproject
+  become: yes
+  become_user: "{{ openproject_user }}"
+
+- name: Install bundler using gem
+  gem:
+    name: bundler
+    install_dir: ~/openproject
+    state: present
+  become: yes
+  become_user: "{{ openproject_user }}"
+
+- name: "Install dependences for Ruby application" 
+  bundler:
+    deployment_mode: yes
+    chdir: ~/openproject
+    extra_args: --without postgres sqlite development test therubyracer docker
+  become: yes
+  become_user: "{{ openproject_user }}"
+
+- name: Update npm
+  shell: 
+    cmd: npm install
+    chdir: ~/openproject
+  become: yes
+  become_user: "{{ openproject_user }}"

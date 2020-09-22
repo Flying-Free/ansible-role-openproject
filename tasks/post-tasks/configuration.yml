@@ -1,0 +1,46 @@
+---
+
+# Finish the installation of OpenProject
+
+# [openproject@host] cd ~/openproject
+# [openproject@host] RAILS_ENV="production" ./bin/rake db:create
+# [openproject@host] RAILS_ENV="production" ./bin/rake db:migrate
+# [openproject@host] RAILS_ENV="production" ./bin/rake db:seed
+# [openproject@host] RAILS_ENV="production" ./bin/rake assets:precompile
+# NOTE: When not specified differently, the default data loaded via db:seed will have an english localization.
+#  You can choose to seed in a different language by specifying the language via the
+#   LOCALE environment variable on the call to db:seed. E.g.
+
+# [openproject@all] RAILS_ENV="production" LOCALE=fr ./bin/rake db:seed
+# will seed the database in the french language.
+
+- name: Ensure Rails environment variables are configured
+  shell:
+    chdir: ~/openproject
+    cmd: |
+      RAILS_ENV="production" ./bin/rake db:create
+      RAILS_ENV="production" ./bin/rake db:migrate
+      RAILS_ENV="production" ./bin/rake db:seed
+      RAILS_ENV="production" ./bin/rake assets:precompile
+  become: yes
+  become_user: "{{ openproject_user }}"
+
+# Secret token
+
+# You need to generate a secret key base for the production environment
+# with ./bin/rake secret and make that available through the environment variable SECRET_KEY_BASE. 
+# In this installation guide, we will use the local .profile of the OpenProject user. 
+# You may alternatively set the environment variable in /etc/environment or pass it to the server 
+# upon start manually in /etc/apache2/envvars.
+
+# [openproject@host] echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.profile
+# [openproject@host] source ~/.profile
+
+- name: Create a secret token
+  shell:
+    chdir: ~/openproject
+    cmd: |
+      echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.profile
+      source ~/.profile
+  become: yes
+  become_user: "{{ openproject_user }}"
