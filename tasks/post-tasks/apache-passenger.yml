@@ -1,0 +1,63 @@
+---
+
+# Serve OpenProject with Apache and Passenger
+# First, we exit the current bash session with the openproject user, 
+# so that we are again in a root shell.
+
+# [openproject@ubuntu] exit
+# Then, we prepare apache and passenger:
+
+# [root@host] apt-get install -y apache2 libcurl4-gnutls-dev      \
+#                                apache2-dev libapr1-dev \
+#                                libaprutil1-dev
+# [root@ubuntu] chmod o+x "/home/openproject"
+
+
+- name: Ensure apache2 is installed
+  yum:
+    name: "{{ item }}"
+    state: present
+  become: yes
+  with_items: "{{ apache_dependencies }}"
+  when: not is_apache
+
+# Now, the Passenger gem is installed and integrated into apache.
+
+# [root@ubuntu] su openproject --login
+# [openproject@ubuntu] cd ~/openproject
+# [openproject@ubuntu] gem install passenger
+# [openproject@ubuntu] passenger-install-apache2-module
+# If you are running on a Virtual Private Server, you need to make sure 
+# you have atleast 1024mb of RAM before running the passenger-install-apache2-module.
+
+# Follow the instructions passenger provides. The passenger installer 
+# will ask you the question in “Which languages are you interested in?”. 
+# We are interested only in ruby.
+
+- name: Ensure passenger is installed
+  become: yes
+  become_user: "{{ openproject_user }}"
+  gem:
+    name: passenger
+    install_dir: ~/openproject
+
+- name: Passenger install apache2 module
+  become: yes
+  become_user: "{{ openproject_user }}"
+  shell:
+    cmd: passenger-install-apache2-module
+    chdir: ~/openproject
+
+# The passenger installer tells us to edit the apache config files. To do this, continue as the root user:
+
+# [openproject@host] exit
+
+# As told by the installer, create the file /etc/apache2/mods-available/passenger.load and add the following line. 
+# But before copy&pasting the following lines, check if the content (especially the version numbers!) 
+# is the same as the passenger-install-apache2-module installer said. When you’re in doubt, do what passenger tells you.
+
+# LoadModule passenger_module /home/openproject/.rbenv/versions/2.1.6/lib/ruby/gems/2.1.0/gems/passenger-5.0.14/buildout/apache2/mod_passenger.so
+
+# Then create the file /etc/apache2/mods-available/passenger.conf with the following contents 
+# (again, take care of the version numbers!):
+
