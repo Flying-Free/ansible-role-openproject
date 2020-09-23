@@ -28,7 +28,7 @@
 # [openproject@ubuntu] gem install passenger
 # [openproject@ubuntu] passenger-install-apache2-module
 # If you are running on a Virtual Private Server, you need to make sure 
-# you have atleast 1024mb of RAM before running the passenger-install-apache2-module.
+# you have at least 1024mb of RAM before running the passenger-install-apache2-module.
 
 # Follow the instructions passenger provides. The passenger installer 
 # will ask you the question in “Which languages are you interested in?”. 
@@ -48,8 +48,7 @@
     cmd: passenger-install-apache2-module
     chdir: ~/openproject
 
-# The passenger installer tells us to edit the apache config files. To do this, continue as the root user:
-
+# The passenger installer tells us to edit the apache config files. To do this, continue as the root user:v
 # [openproject@host] exit
 
 # As told by the installer, create the file /etc/apache2/mods-available/passenger.load and add the following line. 
