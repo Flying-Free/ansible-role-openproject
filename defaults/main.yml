@@ -1,7 +1,7 @@
 ---
 # defaults file for openproject
 
-system-dependences:
+system_dependencies:
  - zlib1g-dev
  - build-essential
  - libssl-dev
@@ -22,7 +22,7 @@ system-dependences:
  - libxml2-dev
  - libxslt1-dev
 
-apache-dependences:
+apache_dependencies:
  - apache2
  - libcurl4-gnutls-dev
  - apache2-dev

@@ -1,2 +1,2 @@
 molecule
-python-vagrant
+docker-py
