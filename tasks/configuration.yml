@@ -50,12 +50,12 @@
   notify: apache - restart
 
 # TODO  Change configuration.yml.j2 and vars in order to connect to the smtp server
-# - name: Ensure common configuration file is up t date
-#   become: yes
-#   template: 
-#     src: configuration.yml.j2
-#     dest: ~/openproject/config/configuration.yml
-#     owner: '{{ openproject_user }}'
-#     group: '{{ openproject_group }}'
-#     mode: '0644'
-#   notify: apache - restart
+- name: Ensure common configuration file is up t date
+  become: yes
+  template: 
+    src: configuration.yml.j2
+    dest: ~/openproject/config/configuration.yml
+    owner: '{{ openproject_user }}'
+    group: '{{ openproject_group }}'
+    mode: '0644'
+  notify: apache - restart

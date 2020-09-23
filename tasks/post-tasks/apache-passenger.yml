@@ -58,6 +58,113 @@
 
 # LoadModule passenger_module /home/openproject/.rbenv/versions/2.1.6/lib/ruby/gems/2.1.0/gems/passenger-5.0.14/buildout/apache2/mod_passenger.so
 
+- name: Get rbenv version from shell
+  become: yes
+  shell: rbenv version
+  register: rbenv_result
+
+- name: Get gem version from shell
+  become: yes
+  shell: gem --version
+  register: gem_result
+
+- name: Get passenger version from shell
+  become: yes
+  shell: passenger -v
+  register: passenger_result
+
+- set_fact:
+    rbenv_version: "{{ 'rbenv_result.stdout' | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
+    gem_version: "{{ 'gem_result.stdout' | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
+    passenger_version: "{{ 'passenger_result.stdout' | regex_search('') }}"
+
+
+- name: Insert a line at the end of a file.
+  become: yes
+  lineinfile:
+    path: /etc/apache2/mods-available/passenger.load
+    line: "LoadModule passenger_module /home/openproject/.rbenv/versions/{{ rbenv_version }}/lib/ruby/gems/{{ gem_version }}/gems/passenger-{{ passenger_version }}/buildout/apache2/mod_passenger.so"
+
 # Then create the file /etc/apache2/mods-available/passenger.conf with the following contents 
 # (again, take care of the version numbers!):
 
+#  <IfModule mod_passenger.c>
+#    PassengerRoot /home/openproject/.rbenv/versions/2.1.6/lib/ruby/gems/2.1.0/gems/passenger-5.0.14
+#    PassengerDefaultRuby /home/openproject/.rbenv/versions/2.1.6/bin/ruby
+#  </IfModule>
+
+- name: Ensure /etc/apache2/mods-available/passenger.conf is created
+  become: yes
+  template:
+    src: passenger.conf.j2
+    dest: /etc/apache2/mods-available/passenger.conf
+    owner: '{{ openproject_user }}'
+    group: '{{ openproject_group }}'
+    mode: '0644'
+
+# Then run:
+
+- become: yes
+  shell: a2enmod passenger
+
+# As the root user, create the file /etc/apache2/sites-available/openproject.conf with the following contents:
+
+# SetEnv EXECJS_RUNTIME Disabled
+
+# <VirtualHost *:80>
+#    ServerName yourdomain.com
+#    # !!! Be sure to point DocumentRoot to 'public'!
+#    DocumentRoot /home/openproject/openproject/public
+#    <Directory /home/openproject/openproject/public>
+#       # This relaxes Apache security settings.
+#       AllowOverride all
+#       # MultiViews must be turned off.
+#       Options -MultiViews
+#       # Uncomment this if you're on Apache >= 2.4:
+#       Require all granted
+#    </Directory>
+
+#    # Request browser to cache assets
+#    <Location /assets/>
+#      ExpiresActive On ExpiresDefault "access plus 1 year"
+#    </Location>
+
+# </VirtualHost>
+
+- name: Ensure /etc/apache2/sites-available/openproject.conf is created
+  become: yes
+  template:
+    src: openproject.conf.j2
+    dest: /etc/apache2/sites-available/openproject.conf
+    owner: '{{ openproject_user }}'
+    group: '{{ openproject_group }}'
+    mode: '0644'
+
+# Let’s enable our new openproject site (and disable the default site, if necessary)
+
+# [root@host] a2dissite 000-default
+# [root@host] a2ensite openproject
+
+- name: Enable our new openproject site (and disable the default site, if necessary)
+  become: yes
+  shell: |
+    a2dissite 000-default
+    a2ensite openproject
+
+# Now, we (re-)start Apache:
+
+# [root@host] service apache2 restart
+
+- name: Restart service apache2, in all cases
+  become: yes
+  service:
+    name: apache2
+    state: restarted
+
+# Your OpenProject installation should be accessible on port 80 (http). 
+# A default admin-account is created for you having the following credentials:
+
+# Username: admin Password: admin
+
+# Please, change the password on the first login. 
+# Also, we highly recommend to configure the SSL module in Apache for https communication.

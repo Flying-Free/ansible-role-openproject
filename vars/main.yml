@@ -11,4 +11,11 @@ openproject_postgres:
   host: None
   name: None
   user: None
-  pass: None 
+  pass: None
+
+smtp:
+  address: smtp.gmail.com
+  port: 587
+  domain: smtp.gmail.com
+  user_name: "***@gmail.com"
+  password: "****"

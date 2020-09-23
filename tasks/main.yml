@@ -21,3 +21,9 @@
 
 - include_tasks: configuration.yml
 
+- include_tasks: post-tasks/configuration.yml
+
+- include_tasks: post-tasks/apache-passenger.yml
+
+- include_tasks: post-tasks/background-jobs.yml
+

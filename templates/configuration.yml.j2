@@ -1,0 +1,11 @@
+production:                          #main level
+  email_delivery_method: :smtp       #settings for the production environment
+  smtp_address: {{ smtp.address }}
+  smtp_port: {{ smtp.port }}
+  smtp_domain: {{ smtp.domain }}
+  smtp_user_name: {{ smtp.user_name }}
+  smtp_password: {{ smtp.password }}
+  smtp_enable_starttls_auto: true
+  smtp_authentication: plain
+
+  rails_cache_store: :memcache
