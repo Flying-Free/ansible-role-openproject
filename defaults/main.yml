@@ -2,29 +2,32 @@
 # defaults file for openproject
 
 system_dependencies:
- - zlib1g-dev
- - build-essential
- - libssl-dev
- - libreadline-dev                      
- - libyaml-dev
- - libgdbm-dev                         
- - libncurses5-dev
+ - zlib-devel
+ - gcc
+ - gcc-c++
+ - make 
+ - openssl-devel
+ - readline-devel                   
+ - libyaml-devel
+ - gdbm-devel                         
+ - ncurses-devel
  - automake                        
- - libtool bison
- - libffi-dev
+ - libtool
+ - bison
+ - libffi-devel
  - git
  - curl               
  - poppler-utils
  - unrtf
- - tesseract-ocr
+ - tesseract
  - catdoc        
  - libxml2
- - libxml2-dev
- - libxslt1-dev
+ - libxml2-devel
+ - libxslt-devel
 
 apache_dependencies:
  - apache2
- - libcurl4-gnutls-dev
- - apache2-dev
- - libapr1-dev
- - libaprutil1-dev
+ - gnutls-devel
+ - apache2-devel
+ - apr-devel
+ - apr-util-devel

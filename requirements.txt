@@ -1,2 +1,4 @@
 molecule
-docker-py
+docker-compose
+# crypt.crypt not supported on Mac OS X/Darwin, install passlib python module
+passlib

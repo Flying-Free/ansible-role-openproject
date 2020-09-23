@@ -18,11 +18,9 @@
 
 - name: Ensure system dependencies are installed
   yum:
-    name: "{{ item }}"
+    name: "{{ system_dependencies }}"
     state: present
   become: yes
-  with_items: "{{ system_dependencies }}"
-
 
 # Install the caching server (memcached)
 # [root@host] apt-get install -y memcached

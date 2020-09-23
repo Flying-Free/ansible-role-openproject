@@ -18,4 +18,4 @@
     shell: "/bin/bash"
     group: "{{ openproject_group }}"
     append: yes
-    password: "{{ openproject_user_pass }}"
+    password: "{{ openproject_user_pass | password_hash('sha512') }}"

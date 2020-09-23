@@ -3,6 +3,14 @@
 
 - name: Verify
   hosts: all
+  vars:
+    is_postgresql: no
+    is_apache: no
+    openproject_postgres:
+      host: localhost
+      name: localhost
+      user: openproject
+      pass: changeme
   tasks:
   - name: Example assertion
     assert:

@@ -15,10 +15,9 @@
 
 - name: Ensure apache2 is installed
   yum:
-    name: "{{ item }}"
+    name: "{{ apache_dependencies }}"
     state: present
   become: yes
-  with_items: "{{ apache_dependencies }}"
   when: not is_apache
 
 # Now, the Passenger gem is installed and integrated into apache.
