@@ -24,6 +24,7 @@ system_dependencies:
  - libxml2
  - libxml2-devel
  - libxslt-devel
+ - bzip2
 
 apache_dependencies:
  - apache2

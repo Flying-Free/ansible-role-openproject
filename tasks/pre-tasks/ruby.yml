@@ -24,15 +24,31 @@
   become: yes
   become_user: "{{ openproject_user }}"
 
-- name: Add rbenv to the PATH
-  shell: |
-    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
-    echo 'eval "$(rbenv init -)"' >> ~/.profile
+# - name: Add rbenv to the ~/.bash_profile
+#   become: yes
+#   become_user: "{{ openproject_user }}"
+#   blockinfile:
+#     path: ~/.bash_profile
+#     block: |
+#       export PATH="$HOME/.rbenv/bin:$PATH"
+#       eval "$(rbenv init -)"
+
+- name: Add rbenv to the ~/.bashrc
   become: yes
   become_user: "{{ openproject_user }}"
+  blockinfile:
+    path: ~/.bashrc
+    block: |
+      export PATH="$HOME/.rbenv/bin:$PATH"
+      eval "$(rbenv init -)"
 
-- name: Source the ~/.profile file
-  shell: source ~/.profile
+# - name: Source the ~/.bash_profile file
+#   shell: source ~/.bash_profile
+#   become: yes
+#   become_user: "{{ openproject_user }}"
+
+- name: Source the ~/.bashrc file
+  shell: source ~/.bashrc
   become: yes
   become_user: "{{ openproject_user }}"
 

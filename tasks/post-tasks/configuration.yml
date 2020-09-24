@@ -40,7 +40,7 @@
   shell:
     chdir: ~/openproject
     cmd: |
-      echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.profile
-      source ~/.profile
+      echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.bash_profile
+      source ~/.bash_profile
   become: yes
   become_user: "{{ openproject_user }}"

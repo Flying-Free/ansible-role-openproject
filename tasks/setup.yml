@@ -18,7 +18,7 @@
 - name: Clone OpenProject repository
   git:
     repo: https://github.com/opf/openproject.git
-    dest: ~/
+    dest: ~/openproject
     version: stable/9
     depth: "1"
   become: yes

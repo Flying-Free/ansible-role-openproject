@@ -6,24 +6,34 @@
 # If you find any bugs or you have any recommendations for improving this tutorial,
 #  please, feel free to create a pull request against this guide.
 
-- include_tasks: pre-tasks/user.yml
+- name: User configurations 
+  include_tasks: pre-tasks/user.yml
 
-- include_tasks: pre-tasks/dependencies.yml
+- name: Configure dependencies
+  include_tasks: pre-tasks/dependencies.yml
 
-- include_tasks: pre-tasks/postgresql.yml
+- name: Install PostgreSQL
+  include_tasks: pre-tasks/postgresql.yml
   when: not is_postgresql
 
-- include_tasks: pre-tasks/ruby.yml
+- name: Install & configure Ruby
+  include_tasks: pre-tasks/ruby.yml
 
-- include_tasks: pre-tasks/node.yml
+- name: Install & configure  NodeJS
+  include_tasks: pre-tasks/node.yml
 
-- include_tasks: setup.yml
+- name: Install OpenProject
+  include_tasks: setup.yml
 
-- include_tasks: configuration.yml
+- name: Configure OpenProject
+  include_tasks: configuration.yml
 
-- include_tasks: post-tasks/configuration.yml
+- name: Post configuration of the environment
+  include_tasks: post-tasks/configuration.yml
 
-- include_tasks: post-tasks/apache-passenger.yml
+- name: Install & configure Apache & Passenger
+  include_tasks: post-tasks/apache-passenger.yml
 
-- include_tasks: post-tasks/background-jobs.yml
+- name: Configure background jobs
+  include_tasks: post-tasks/background-jobs.yml
 
