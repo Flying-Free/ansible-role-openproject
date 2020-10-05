@@ -1,7 +1,7 @@
 production:
   adapter:  postgresql
   host:     {{ openproject_postgres.host }}
-  database: {{ openproject_postgres.name }}
+  database: {{ openproject_postgres.db }}
   username: {{ openproject_postgres.user }}
   password: {{ openproject_postgres.pass }}
   encoding: utf8

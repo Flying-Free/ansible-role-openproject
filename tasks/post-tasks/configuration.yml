@@ -14,17 +14,6 @@
 # [openproject@all] RAILS_ENV="production" LOCALE=fr ./bin/rake db:seed
 # will seed the database in the french language.
 
-- name: Ensure Rails environment variables are configured
-  shell:
-    chdir: ~/openproject
-    cmd: |
-      RAILS_ENV="production" ./bin/rake db:create
-      RAILS_ENV="production" ./bin/rake db:migrate
-      RAILS_ENV="production" ./bin/rake db:seed
-      RAILS_ENV="production" ./bin/rake assets:precompile
-  become: yes
-  become_user: "{{ openproject_user }}"
-
 # Secret token
 
 # You need to generate a secret key base for the production environment
@@ -37,10 +26,26 @@
 # [openproject@host] source ~/.profile
 
 - name: Create a secret token
-  shell:
-    chdir: ~/openproject
-    cmd: |
+  shell: |
       echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.bash_profile
       source ~/.bash_profile
+  args:
+    chdir: ~/openproject
   become: yes
   become_user: "{{ openproject_user }}"
+  become_flags: "-i"
+
+- name: Ensure Rails environment variables are configured
+  shell: |
+      env RAILS_ENV="production" ./bin/rake db:create
+      env RAILS_ENV="production" ./bin/rake db:migrate
+      env RAILS_ENV="production" ./bin/rake db:seed
+      env RAILS_ENV="production" ./bin/rake assets:precompile
+  args:
+    chdir: ~/openproject
+  environment:
+    RAILS_ENV: "production"
+  become: yes
+  become_user: "{{ openproject_user }}"
+  become_flags: "-i"
+

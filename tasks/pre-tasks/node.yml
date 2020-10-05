@@ -24,30 +24,37 @@
     repo: https://github.com/OiNutter/nodenv.git
     dest: ~/.nodenv
   become_user: "{{ openproject_user }}"
+  become: yes
+
 
 - name: Add nodenv to the PATH
   become_user: "{{ openproject_user }}"
-  blockinfile:
-    path: ~/.bash_profile
-    block: |
+  become: yes
+  lineinfile:
+    path: ~/.bashrc
+    line: |
       export PATH="$HOME/.nodenv/bin:$PATH"
       eval "$(nodenv init -)"
 
-# - name: Source the ~/.bash_profile file
-#   shell: source ~/.bash_profile
-#   become_user: "{{ openproject_user }}"
+- name: Source the ~/.bashrc file
+  shell: source ~/.bashrc
+  become: yes
+  become_user: "{{ openproject_user }}"
 
 - name: Clone node build repository
   git:
-    repo: git://github.com/OiNutter/node-build.git
+    repo: https://github.com/OiNutter/node-build.git
     dest: ~/.nodenv/plugins/node-build
   become_user: "{{ openproject_user }}"
+  become: yes
 
 - name: Install node
   shell: |
-    source ~/.bash_profile
     nodenv install 8.12.0
     nodenv rehash
     nodenv global 8.12.0
+  become: yes
   become_user: "{{ openproject_user }}"
+  become_flags: "-i"
+
 

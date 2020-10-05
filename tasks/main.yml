@@ -14,7 +14,6 @@
 
 - name: Install PostgreSQL
   include_tasks: pre-tasks/postgresql.yml
-  when: not is_postgresql
 
 - name: Install & configure Ruby
   include_tasks: pre-tasks/ruby.yml

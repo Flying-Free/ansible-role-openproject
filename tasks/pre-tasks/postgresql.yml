@@ -25,22 +25,41 @@
 # # You will be root again now.
 
 - name: Ensure Postgresql is installed
+  become: yes
   yum:
     name:
       - postgresql
       - postgresql-contrib
-      - libpq-dev
-  state: present
-  become: yes
+      # - libpq-dev
+      - postgresql-devel
+      - postgresql-libs
+    state: present
 
-- name: Create openproject user
-  postgresql_user:
-    name: openproject
-    password: "{{ openproject_user_pass }}"
-    expires: infinity
+- name: Install psycopg2 for ansible to be able to create postgresql users
+  pip: name=psycopg2-binary
+  become: yes
 
 - name: Create a new database with name "openproject"
   postgresql_db:
-    name: openproject
-    owner: openproject
-  become_user: postgresql
+    login_host: "{{ openproject_postgres.host }}"
+    login_user: "{{ postgres_admin.user }}"
+    login_password: "{{ postgres_admin.pass }}"
+    port: "{{ openproject_postgres.port }}"
+    name: "{{ openproject_postgres.db }}"
+    owner: "{{ postgres_admin.user }}"
+  # become_user: postgresql
+  # become: yes
+
+- name: Create openproject user
+  postgresql_user:
+    login_host: "{{ openproject_postgres.host }}"
+    login_user: "{{ postgres_admin.user }}"
+    login_password: "{{ postgres_admin.pass }}"
+    port: "{{ openproject_postgres.port }}"
+    db: "{{ openproject_postgres.db }}"
+    name: "{{ openproject_postgres.user }}"
+    password: "{{ openproject_postgres.pass }}"
+    role_attr_flags: CREATEDB
+    expires: infinity
+  # become: yes
+

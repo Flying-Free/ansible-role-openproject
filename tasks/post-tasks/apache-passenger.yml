@@ -18,7 +18,7 @@
     name: "{{ apache_dependencies }}"
     state: present
   become: yes
-  when: not is_apache
+  when: not is_apache_installed
 
 # Now, the Passenger gem is installed and integrated into apache.
 
@@ -36,6 +36,7 @@
 - name: Ensure passenger is installed
   become: yes
   become_user: "{{ openproject_user }}"
+  become_flags: "-i"
   gem:
     name: passenger
     install_dir: ~/openproject
@@ -43,6 +44,7 @@
 - name: Passenger install apache2 module
   become: yes
   become_user: "{{ openproject_user }}"
+  become_flags: "-i"
   shell:
     cmd: passenger-install-apache2-module
     chdir: ~/openproject
@@ -77,7 +79,7 @@
     passenger_version: "{{ 'passenger_result.stdout' | regex_search('') }}"
 
 
-- name: Insert a line at the end of a file.
+- name: Insert LoadModule a line in passenger.load.
   become: yes
   lineinfile:
     path: /etc/apache2/mods-available/passenger.load

@@ -5,9 +5,9 @@
 
 # [root@host] su openproject --login
 # [openproject@host] git clone https://github.com/sstephenson/rbenv.git ~/.rbenv
-# [openproject@host] echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.profile
-# [openproject@host] echo 'eval "$(rbenv init -)"' >> ~/.profile
-# [openproject@host] source ~/.profile
+# [openproject@host] echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+# [openproject@host] echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+# [openproject@host] source ~/.bashrc
 # [openproject@host] git clone https://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
 
 # [openproject@host] rbenv install 2.6.1
@@ -24,33 +24,14 @@
   become: yes
   become_user: "{{ openproject_user }}"
 
-# - name: Add rbenv to the ~/.bash_profile
-#   become: yes
-#   become_user: "{{ openproject_user }}"
-#   blockinfile:
-#     path: ~/.bash_profile
-#     block: |
-#       export PATH="$HOME/.rbenv/bin:$PATH"
-#       eval "$(rbenv init -)"
-
 - name: Add rbenv to the ~/.bashrc
   become: yes
   become_user: "{{ openproject_user }}"
-  blockinfile:
+  lineinfile:
     path: ~/.bashrc
-    block: |
+    line: |
       export PATH="$HOME/.rbenv/bin:$PATH"
       eval "$(rbenv init -)"
-
-# - name: Source the ~/.bash_profile file
-#   shell: source ~/.bash_profile
-#   become: yes
-#   become_user: "{{ openproject_user }}"
-
-- name: Source the ~/.bashrc file
-  shell: source ~/.bashrc
-  become: yes
-  become_user: "{{ openproject_user }}"
 
 - name: Clone ruby build repository
   git:
@@ -59,11 +40,25 @@
   become: yes
   become_user: "{{ openproject_user }}"
 
-- name: Install ruby
-  shell: |
-    rbenv install 2.6.1
-    rbenv rehash
-    rbenv global 2.6.1
+- name: Add rbenv to the ~/.bashrc
+  become: yes
+  become_user: "{{ openproject_user }}"
+  lineinfile:
+    path: ~/.bashrc
+    line: export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
+
+- name: Source the ~/.bashrc file
+  shell: source ~/.bashrc
   become: yes
   become_user: "{{ openproject_user }}"
 
+- name: Install ruby
+  become_user: "{{ openproject_user }}"
+  become: yes
+  become_flags: "-i"
+  shell:
+    cmd: |
+     rbenv install 2.6.1
+     rbenv rehash
+     rbenv global 2.6.1
+    chdir: $HOME

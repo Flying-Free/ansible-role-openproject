@@ -4,8 +4,8 @@
 - name: Verify
   hosts: all
   vars:
-    is_postgresql: no
-    is_apache: no
+    is_postgresql_installed: yes
+    is_apache_installed: no
     openproject_postgres:
       host: localhost
       name: localhost
