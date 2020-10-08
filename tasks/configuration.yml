@@ -54,7 +54,7 @@
     owner: '{{ openproject_user }}'
     group: '{{ openproject_group }}'
     mode: '0644'
-  # notify: apache - restart
+  notify: apache - restart
 
 # TODO  Change configuration.yml.j2 and vars in order to connect to the smtp server
 - name: Ensure common configuration file is up t date
@@ -65,4 +65,4 @@
     owner: '{{ openproject_user }}'
     group: '{{ openproject_group }}'
     mode: '0644'
-  # notify: apache - restart
+  notify: apache - restart

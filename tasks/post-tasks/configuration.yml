@@ -25,27 +25,99 @@
 # [openproject@host] echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.profile
 # [openproject@host] source ~/.profile
 
-- name: Create a secret token
-  shell: |
-      echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.bash_profile
-      source ~/.bash_profile
-  args:
-    chdir: ~/openproject
-  become: yes
-  become_user: "{{ openproject_user }}"
-  become_flags: "-i"
+# - name: Ensure Rails environment is configured [env RAILS_ENV="production" ./bin/rake db:create]
+#   shell: env RAILS_ENV="production" ./bin/rake db:create
+#   args:
+#     chdir: ~/openproject
+#   environment:
+#     RAILS_ENV: "production"
+#   become: yes
+#   become_user: "{{ openproject_user }}"
+#   become_flags: "-i"
 
-- name: Ensure Rails environment variables are configured
-  shell: |
-      env RAILS_ENV="production" ./bin/rake db:create
-      env RAILS_ENV="production" ./bin/rake db:migrate
-      env RAILS_ENV="production" ./bin/rake db:seed
-      env RAILS_ENV="production" ./bin/rake assets:precompile
+# - name: Ensure Rails environment is configured [env RAILS_ENV="production" ./bin/rake db:migrate]
+#   shell: env RAILS_ENV="production" ./bin/rake db:migrate
+#   args:
+#     chdir: ~/openproject
+#   environment:
+#     RAILS_ENV: "production"
+#   become: yes
+#   become_user: "{{ openproject_user }}"
+#   become_flags: "-i"
+
+# - name: Ensure Rails environment is configured [env RAILS_ENV="production" ./bin/rake db:seed]
+#   shell: env RAILS_ENV="production" ./bin/rake db:seed
+#   args:
+#     chdir: ~/openproject
+#   environment:
+#     RAILS_ENV: "production"
+#   become: yes
+#   become_user: "{{ openproject_user }}"
+#   become_flags: "-i"
+
+# - name: Ensure Rails environment is configured [env RAILS_ENV="production" ./bin/rake assets:precompile]
+#   shell: env RAILS_ENV="production" ./bin/rake assets:precompile
+#   args:
+#     chdir: ~/openproject
+#   environment:
+#     RAILS_ENV: "production"
+#   become: yes
+#   become_user: "{{ openproject_user }}"
+#   become_flags: "-i"
+
+- name: set up database
+  shell: cd ~/openproject && env RAILS_ENV="production" ./bin/rake db:create
   args:
-    chdir: ~/openproject
+    chdir: '~/openproject'
+  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
+  become: yes
+  become_user: '{{openproject_user}}'
+  register: rake_db_create_all
+  changed_when: '"already exists" not in rake_db_create_all.stderr'
+
+- name: generate secret token
+  shell: cd ~/openproject && env RAILS_ENV="production" ./bin/rake generate_secret_token
+  args:
+    chdir: '~/openproject'
+    creates: '~/openproject/config/secret_token.yml'
+  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
+  become: yes
+  become_user: '{{openproject_user}}'
+
+- name: migrate database
+  shell: cd ~/openproject && env RAILS_ENV="production" ./bin/rake db:migrate
+  args:
+    chdir: '~/openproject'
   environment:
-    RAILS_ENV: "production"
+    RAILS_ENV: 'production'
+  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
   become: yes
-  become_user: "{{ openproject_user }}"
-  become_flags: "-i"
+  become_user: '{{openproject_user}}'
+  register: generate_migration
+  changed_when: generate_migration.stdout != ""
 
+- name: seed database
+  shell: cd ~/openproject && env RAILS_ENV="production" LOCALE="{{openproject_locale}}" ./bin/rake db:seed
+  args:
+    chdir: '~/openproject'
+  environment:
+    RAILS_ENV: 'production'
+    LOCALE: '{{openproject_locale}}'
+  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
+  become: yes
+  become_user: '{{openproject_user}}'
+  register: seed_database
+  changed_when: '"Skipping" not in seed_database.stdout'
+
+
+- name: Ruby precompile assets
+  shell: cd ~/openproject && env RAILS_ENV="production" ./bin/rake assets:precompile
+  args:
+    chdir: '~/openproject'
+  environment:
+    RAILS_ENV: 'production'
+  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
+  become: yes
+  become_user: '{{ openproject_user }}'
+  async: 3600
+  poll: 1

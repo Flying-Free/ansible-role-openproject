@@ -20,7 +20,7 @@
     repo: https://github.com/opf/openproject.git
     dest: ~/openproject
     version: stable/9
-    # depth: "1"
+    depth: "1"
   become: yes
   become_user: "{{ openproject_user }}"
 
@@ -42,16 +42,16 @@
   become_user: "{{ openproject_user }}"
   become_flags: "-i"
 
-- name: Install mysql2 using gem
-  gem:
-    name: mysql2
-    install_dir: ~/openproject
-    user_install: no
-    version: 0.5.2
-    state: present
-  become: yes
-  become_user: "{{ openproject_user }}"
-  become_flags: "-i"
+# - name: Install mysql2 using gem
+#   gem:
+#     name: mysql2
+#     install_dir: ~/openproject
+#     user_install: no
+#     version: 0.5.2
+#     state: present
+#   become: yes
+#   become_user: "{{ openproject_user }}"
+#   become_flags: "-i"
 
 - name: Install pg using gem
   gem:
@@ -75,10 +75,9 @@
   become_user: "{{ openproject_user }}"
   become_flags: "-i"
 
-- name: Update npm
-  shell: 
-    cmd: npm install
-    chdir: ~/openproject
+- name: Install OpenProject with npm 
+  npm: 
+    path: ~/openproject
   become: yes
   become_user: "{{ openproject_user }}"
   become_flags: "-i"
