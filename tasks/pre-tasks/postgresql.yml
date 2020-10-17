@@ -47,8 +47,7 @@
     port: "{{ openproject_postgres.port }}"
     name: "{{ openproject_postgres.db }}"
     owner: "{{ postgres_admin.user }}"
-  # become_user: postgresql
-  # become: yes
+
 
 - name: Create openproject user
   postgresql_user:
@@ -61,5 +60,4 @@
     password: "{{ openproject_postgres.pass }}"
     role_attr_flags: CREATEDB
     expires: infinity
-  # become: yes
 
