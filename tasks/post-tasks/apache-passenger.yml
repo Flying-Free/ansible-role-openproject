@@ -74,9 +74,9 @@
   register: passenger_result
 
 - set_fact:
-    rbenv_version: "{{ 'rbenv_result.stdout' | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
-    gem_version: "{{ 'gem_result.stdout' | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
-    passenger_version: "{{ 'passenger_result.stdout' | regex_search('') }}"
+    rbenv_version: "{{ rbenv_result.stdout | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
+    gem_version: "{{ gem_result.stdout | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
+    passenger_version: "{{ passenger_result.stdout | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
 
 
 - name: Insert LoadModule a line in passenger.load.
