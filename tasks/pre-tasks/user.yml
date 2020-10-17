@@ -5,13 +5,13 @@
 # sudo useradd --create-home --gid openproject openproject
 # sudo passwd openproject #(enter desired password)
 
-- name: create openproject group
+- name: Create openproject group
   group:
     name: '{{openproject_group}}'
     system: yes
   become: yes
 
-- name: create openproject user
+- name: Create openproject user
   user:
     name: '{{openproject_user}}'
     group: '{{openproject_group}}'

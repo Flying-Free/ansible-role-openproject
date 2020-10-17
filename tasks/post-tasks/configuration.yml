@@ -25,99 +25,32 @@
 # [openproject@host] echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.profile
 # [openproject@host] source ~/.profile
 
-# - name: Ensure Rails environment is configured [env RAILS_ENV="production" ./bin/rake db:create]
-#   shell: env RAILS_ENV="production" ./bin/rake db:create
-#   args:
-#     chdir: ~/openproject
-#   environment:
-#     RAILS_ENV: "production"
-#   become: yes
-#   become_user: "{{ openproject_user }}"
-#   become_flags: "-i"
-
-# - name: Ensure Rails environment is configured [env RAILS_ENV="production" ./bin/rake db:migrate]
-#   shell: env RAILS_ENV="production" ./bin/rake db:migrate
-#   args:
-#     chdir: ~/openproject
-#   environment:
-#     RAILS_ENV: "production"
-#   become: yes
-#   become_user: "{{ openproject_user }}"
-#   become_flags: "-i"
-
-# - name: Ensure Rails environment is configured [env RAILS_ENV="production" ./bin/rake db:seed]
-#   shell: env RAILS_ENV="production" ./bin/rake db:seed
-#   args:
-#     chdir: ~/openproject
-#   environment:
-#     RAILS_ENV: "production"
-#   become: yes
-#   become_user: "{{ openproject_user }}"
-#   become_flags: "-i"
-
-# - name: Ensure Rails environment is configured [env RAILS_ENV="production" ./bin/rake assets:precompile]
-#   shell: env RAILS_ENV="production" ./bin/rake assets:precompile
-#   args:
-#     chdir: ~/openproject
-#   environment:
-#     RAILS_ENV: "production"
-#   become: yes
-#   become_user: "{{ openproject_user }}"
-#   become_flags: "-i"
-
-- name: set up database
-  shell: cd ~/openproject && env RAILS_ENV="production" ./bin/rake db:create
+- name: Add SECRET_KEY_BASE to the ~/.bashrc
+  shell: echo "export SECRET_KEY_BASE=$(./bin/rake secret)" >> ~/.bashrc
   args:
-    chdir: '~/openproject'
-  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
-  become: yes
-  become_user: '{{openproject_user}}'
-  register: rake_db_create_all
-  changed_when: '"already exists" not in rake_db_create_all.stderr'
-
-- name: generate secret token
-  shell: cd ~/openproject && env RAILS_ENV="production" ./bin/rake generate_secret_token
-  args:
-    chdir: '~/openproject'
-    creates: '~/openproject/config/secret_token.yml'
-  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
-  become: yes
-  become_user: '{{openproject_user}}'
-
-- name: migrate database
-  shell: cd ~/openproject && env RAILS_ENV="production" ./bin/rake db:migrate
-  args:
-    chdir: '~/openproject'
-  environment:
-    RAILS_ENV: 'production'
-  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
-  become: yes
-  become_user: '{{openproject_user}}'
-  register: generate_migration
-  changed_when: generate_migration.stdout != ""
-
-- name: seed database
-  shell: cd ~/openproject && env RAILS_ENV="production" LOCALE="{{openproject_locale}}" ./bin/rake db:seed
-  args:
-    chdir: '~/openproject'
-  environment:
-    RAILS_ENV: 'production'
-    LOCALE: '{{openproject_locale}}'
-  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
-  become: yes
-  become_user: '{{openproject_user}}'
-  register: seed_database
-  changed_when: '"Skipping" not in seed_database.stdout'
-
-
-- name: Ruby precompile assets
-  shell: cd ~/openproject && env RAILS_ENV="production" ./bin/rake assets:precompile
-  args:
-    chdir: '~/openproject'
-  environment:
-    RAILS_ENV: 'production'
-  # FIXME: from ansible v2.0.0 we can maybe use the bundler module
+    chdir: ~/openproject
   become: yes
   become_user: '{{ openproject_user }}'
-  async: 3600
-  poll: 1
+  become_flags: "-i"
+
+- name: Source the ~/.bashrc file
+  shell: source ~/.bashrc
+  become: yes
+  become_user: "{{ openproject_user }}"
+  become_flags: "-i"
+
+
+- name: Execute some post commands with rake
+  become: yes
+  become_user: '{{ openproject_user }}'
+  become_flags: "-i"
+  shell: "bundle exec {{ item }}"
+  args:
+    chdir: '~/openproject'
+  environment:
+    RAILS_ENV: 'production'
+  with_items:
+    - './bin/rake db:create --trace'
+    - './bin/rake db:migrate --trace'
+    - './bin/rake db:seed --trace'
+    - './bin/rake assets:precompile --trace'

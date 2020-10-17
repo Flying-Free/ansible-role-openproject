@@ -32,6 +32,7 @@
     line: |
       export PATH="$HOME/.rbenv/bin:$PATH"
       eval "$(rbenv init -)"
+  become_flags: "-i"
 
 - name: Clone ruby build repository
   git:
@@ -46,11 +47,13 @@
   lineinfile:
     path: ~/.bashrc
     line: export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"
+  become_flags: "-i"
 
 - name: Source the ~/.bashrc file
   shell: source ~/.bashrc
   become: yes
   become_user: "{{ openproject_user }}"
+  become_flags: "-i"
 
 - name: Install ruby
   become_user: "{{ openproject_user }}"
@@ -58,7 +61,8 @@
   become_flags: "-i"
   shell:
     cmd: |
-     rbenv install 2.6.1
+     rbenv install 2.7.1
      rbenv rehash
-     rbenv global 2.6.1
+     rbenv global 2.7.1
+     rbenv local 2.7.1 
     chdir: $HOME
