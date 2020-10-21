@@ -8,7 +8,7 @@
   register: ruby_result
 
 - set_fact:
-    ruby_version: "{{ 'ruby_result.stdout' | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
+    ruby_version: "{{ 'ruby_result.stdout' | regex_search('^(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)') }}"
 
 # OpenProject sends (some) mails asynchronously by using background jobs. 
 # All such jobs are collected in a queue, so that a separate process can work on them. 

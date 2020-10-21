@@ -13,12 +13,21 @@
 # [root@ubuntu] chmod o+x "/home/openproject"
 
 
-- name: Ensure apache2 is installed
+- name: Ensure httpd is installed
+  become: yes
   yum:
     name: "{{ apache_dependencies }}"
     state: present
-  become: yes
   when: not is_apache_installed
+
+- name: enable service httpd and ensure it is not masked
+  become: yes
+  systemd:
+    name: httpd
+    enabled: yes
+    masked: no
+  when: not is_apache_installed
+
 
 # Now, the Passenger gem is installed and integrated into apache.
 
@@ -33,20 +42,12 @@
 # will ask you the question in “Which languages are you interested in?”. 
 # We are interested only in ruby.
 
-- name: Ensure passenger is installed
-  become: yes
-  become_user: "{{ openproject_user }}"
-  become_flags: "-i"
-  gem:
-    name: passenger
-    install_dir: ~/openproject
-
 - name: Passenger install apache2 module
   become: yes
   become_user: "{{ openproject_user }}"
   become_flags: "-i"
   shell:
-    cmd: passenger-install-apache2-module
+    cmd: gem install passenger && passenger-install-apache2-module --auto --language Ruby
     chdir: ~/openproject
 
 # The passenger installer tells us to edit the apache config files. To do this, continue as the root user:v
@@ -59,107 +60,65 @@
 # LoadModule passenger_module /home/openproject/.rbenv/versions/2.1.6/lib/ruby/gems/2.1.0/gems/passenger-5.0.14/buildout/apache2/mod_passenger.so
 
 - name: Get rbenv version from shell
-  become: yes
   shell: rbenv version
   register: rbenv_result
+  become: yes
+  become_user: "{{ openproject_user }}"
+  become_flags: "-i"
 
 - name: Get gem version from shell
   become: yes
+  become_user: "{{ openproject_user }}"
+  become_flags: "-i"  
   shell: gem --version
   register: gem_result
 
 - name: Get passenger version from shell
   become: yes
+  become_user: "{{ openproject_user }}"
+  become_flags: "-i"
   shell: passenger -v
   register: passenger_result
 
 - set_fact:
-    rbenv_version: "{{ rbenv_result.stdout | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
-    gem_version: "{{ gem_result.stdout | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
-    passenger_version: "{{ passenger_result.stdout | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)') }}"
+    rbenv_version: '{{ rbenv_result.stdout | regex_search("^([0-9]+\\.)?([0-9]+\\.)?(\\*|[0-9]+)") }}'
+    gem_version: '{{ gem_result.stdout | regex_search("^([0-9]+\\.)?([0-9]+\\.)?(\\*|[0-9]+)") }}'
+    passenger_version: '{{ passenger_result.stdout | regex_search("^([0-9]+\\.)?([0-9]+\\.)?(\\*|[0-9]+)") }}'
 
-
-- name: Insert LoadModule a line in passenger.load.
-  become: yes
-  lineinfile:
-    path: /etc/apache2/mods-available/passenger.load
-    line: "LoadModule passenger_module /home/openproject/.rbenv/versions/{{ rbenv_version }}/lib/ruby/gems/{{ gem_version }}/gems/passenger-{{ passenger_version }}/buildout/apache2/mod_passenger.so"
-
-# Then create the file /etc/apache2/mods-available/passenger.conf with the following contents 
-# (again, take care of the version numbers!):
-
-#  <IfModule mod_passenger.c>
-#    PassengerRoot /home/openproject/.rbenv/versions/2.1.6/lib/ruby/gems/2.1.0/gems/passenger-5.0.14
-#    PassengerDefaultRuby /home/openproject/.rbenv/versions/2.1.6/bin/ruby
-#  </IfModule>
-
-- name: Ensure /etc/apache2/mods-available/passenger.conf is created
-  become: yes
-  template:
-    src: passenger.conf.j2
-    dest: /etc/apache2/mods-available/passenger.conf
-    owner: '{{ openproject_user }}'
-    group: '{{ openproject_group }}'
-    mode: '0644'
-
-# Then run:
-
-- become: yes
-  shell: a2enmod passenger
-
-# As the root user, create the file /etc/apache2/sites-available/openproject.conf with the following contents:
-
-# SetEnv EXECJS_RUNTIME Disabled
-
-# <VirtualHost *:80>
-#    ServerName yourdomain.com
-#    # !!! Be sure to point DocumentRoot to 'public'!
-#    DocumentRoot /home/openproject/openproject/public
-#    <Directory /home/openproject/openproject/public>
-#       # This relaxes Apache security settings.
-#       AllowOverride all
-#       # MultiViews must be turned off.
-#       Options -MultiViews
-#       # Uncomment this if you're on Apache >= 2.4:
-#       Require all granted
-#    </Directory>
-
-#    # Request browser to cache assets
-#    <Location /assets/>
-#      ExpiresActive On ExpiresDefault "access plus 1 year"
-#    </Location>
-
-# </VirtualHost>
-
-- name: Ensure /etc/apache2/sites-available/openproject.conf is created
+- name: Ensure /etc/httpd/sites-available/openproject.conf is created
   become: yes
   template:
     src: openproject.conf.j2
-    dest: /etc/apache2/sites-available/openproject.conf
+    dest: /etc/httpd/conf/httpd.conf
     owner: '{{ openproject_user }}'
     group: '{{ openproject_group }}'
     mode: '0644'
 
-# Let’s enable our new openproject site (and disable the default site, if necessary)
-
-# [root@host] a2dissite 000-default
-# [root@host] a2ensite openproject
-
-- name: Enable our new openproject site (and disable the default site, if necessary)
+- name: Insert LoadModule a line in /etc/httpd/conf/httpd.conf
   become: yes
-  shell: |
-    a2dissite 000-default
-    a2ensite openproject
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    line: "LoadModule passenger_module /home/openproject/.rbenv/versions/{{ rbenv_version }}/lib/ruby/gems/{{ gem_version }}/gems/passenger-{{ passenger_version }}/buildout/apache2/mod_passenger.so"
+
+
+- name: Ensure /etc/httpd/conf.d/passenger.conf is created
+  become: yes
+  template:
+    src: passenger.conf.j2
+    dest: /etc/httpd/conf.d/passenger.conf
+    owner: '{{ openproject_user }}'
+    group: '{{ openproject_group }}'
+    mode: '0644'
 
 # Now, we (re-)start Apache:
 
-# [root@host] service apache2 restart
+# - name: Restart service httpd, in all cases
+#   become: yes
+#   systemd:
+#     name: httpd.service
+#     state: restarted
 
-- name: Restart service apache2, in all cases
-  become: yes
-  service:
-    name: apache2
-    state: restarted
+- shell: systemctl start httpd.service
 
 # Your OpenProject installation should be accessible on port 80 (http). 
 # A default admin-account is created for you having the following credentials:

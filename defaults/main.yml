@@ -16,7 +16,8 @@ system_dependencies:
  - bison
  - libffi-devel
  - git
- - curl               
+ - curl
+ - libcurl-devel               
  - poppler-utils
  - unrtf
  - tesseract
@@ -28,8 +29,8 @@ system_dependencies:
  - mysql-devel
 
 apache_dependencies:
- - apache2
+ - httpd
  - gnutls-devel
- - apache2-devel
+ - httpd-devel
  - apr-devel
  - apr-util-devel

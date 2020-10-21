@@ -1,19 +1,5 @@
 ---
 
-# Finish the installation of OpenProject
-
-# [openproject@host] cd ~/openproject
-# [openproject@host] RAILS_ENV="production" ./bin/rake db:create
-# [openproject@host] RAILS_ENV="production" ./bin/rake db:migrate
-# [openproject@host] RAILS_ENV="production" ./bin/rake db:seed
-# [openproject@host] RAILS_ENV="production" ./bin/rake assets:precompile
-# NOTE: When not specified differently, the default data loaded via db:seed will have an english localization.
-#  You can choose to seed in a different language by specifying the language via the
-#   LOCALE environment variable on the call to db:seed. E.g.
-
-# [openproject@all] RAILS_ENV="production" LOCALE=fr ./bin/rake db:seed
-# will seed the database in the french language.
-
 # Secret token
 
 # You need to generate a secret key base for the production environment
@@ -39,6 +25,19 @@
   become_user: "{{ openproject_user }}"
   become_flags: "-i"
 
+# Finish the installation of OpenProject
+
+# [openproject@host] cd ~/openproject
+# [openproject@host] RAILS_ENV="production" ./bin/rake db:create
+# [openproject@host] RAILS_ENV="production" ./bin/rake db:migrate
+# [openproject@host] RAILS_ENV="production" ./bin/rake db:seed
+# [openproject@host] RAILS_ENV="production" ./bin/rake assets:precompile
+# NOTE: When not specified differently, the default data loaded via db:seed will have an english localization.
+# You can choose to seed in a different language by specifying the language via the
+# LOCALE environment variable on the call to db:seed. E.g.
+
+# [openproject@all] RAILS_ENV="production" LOCALE=fr ./bin/rake db:seed
+# will seed the database in the french language.
 
 - name: Execute some post commands with rake
   become: yes
@@ -50,7 +49,7 @@
   environment:
     RAILS_ENV: 'production'
   with_items:
-    - './bin/rake db:create --trace'
-    - './bin/rake db:migrate --trace'
-    - './bin/rake db:seed --trace'
-    - './bin/rake assets:precompile --trace'
+    - './bin/rake db:create'
+    - './bin/rake db:migrate'
+    - './bin/rake db:seed'
+    - './bin/rake assets:precompile'

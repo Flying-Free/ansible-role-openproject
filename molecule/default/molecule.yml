@@ -2,11 +2,13 @@
 dependency:
   name: galaxy
 driver:
-  name: docker
+  name: vagrant
+  provider:
+    name: virtualbox
 platforms:
   - name: instance
-    image: docker.io/pycontribs/centos:7
-    pre_build_image: true
+    instance_name: "openproject-test"
+    box: centos/7
 provisioner:
   name: ansible
   config_options:
@@ -14,5 +16,5 @@ provisioner:
       remote_user: root
       remote_tmp: /tmp/.ansible
   log: true
-verifier:
-  name: ansible
+lint:
+  name: yamllint
